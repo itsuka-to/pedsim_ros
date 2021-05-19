@@ -1,33 +1,35 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.5)
+
 project(pedsim_srvs)
 
+# Default to C++14
+if(NOT CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD 14)
+endif()
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
 
-set( MESSAGE_DEPENDENCIES
-    pedsim_msgs
-    std_msgs
+find_package(ament_cmake REQUIRED)
+find_package(rosidl_default_generators REQUIRED)
+find_package(std_msgs REQUIRED)
+find_package(pedsim_msgs REQUIRED)
+
+
+set(srv_files
+  "srv/GetAgentState.srv"
+  "srv/GetAllAgentsState.srv"
+  "srv/SetAgentState.srv"
+  "srv/SetAllAgentsState.srv"
 )
-
-find_package(catkin REQUIRED 
-  COMPONENTS
-  message_generation
-  ${MESSAGE_DEPENDENCIES}
-)
-
-include_directories(${catkin_INCLUDE_DIRS})
-link_directories(${catkin_LIBRARY_DIRS})
-
 
 # the services
-add_service_files( DIRECTORY srv
-  FILES
-  SetAgentState.srv
-  GetAgentState.srv
-  SetAllAgentsState.srv
-  GetAllAgentsState.srv
+rosidl_generate_interfaces(${PROJECT_NAME}
+  ${srv_files}
+  DEPENDENCIES pedsim_msgs std_msgs
+  ADD_LINTER_TESTS  
 )
 
-generate_messages(DEPENDENCIES ${MESSAGE_DEPENDENCIES})
+ament_export_dependencies(rosidl_default_runtime)
 
-#add_dependencies(some_target ${PROJECT_NAME}_gencpp)
-
-catkin_package( CATKIN_DEPENDS message_runtime ${MESSAGE_DEPENDENCIES})
+ament_package()
