@@ -1,9 +1,10 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 Created on Mon Dec  2 17:03:34 2019
 
 @author: mahmoud
 """
+import os
 
 import rclpy
 # from gazebo_msgs.srv import SpawnModel
@@ -42,7 +43,7 @@ def actor_poses_callback(actors):
     rclpy.shutdown()
 
 
-def spawn_entity(node, name, entity_xml, robot_namespace, initial_pose, reference_frame, gazebo_namespace="", timeout=DEFAULT_TIMEOUT):
+def spawn_entity(node, name, entity_xml, robot_namespace, initial_pose, reference_frame, gazebo_namespace="", timeout=1.0):
     if timeout < 0:
         node.get_logger().error('spawn_entity timeout must be greater than zero')
         return False
@@ -71,7 +72,7 @@ def spawn_entity(node, name, entity_xml, robot_namespace, initial_pose, referenc
     return False
 
 
-def main(args=args):
+def main(args=None):
     global node, xml_string
     rclpy.init()
     
@@ -82,10 +83,10 @@ def main(args=args):
     # pkg_path = rospack1.get_path('pedsim_gazebo_plugin')
     # default_actor_model_file = pkg_path + "/models/actor_model.sdf"
     pkg_path = get_package_share_directory('pedsim_gazebo_plugin')
-    default_actor_model_file = pkg_path + "models/actor_model.sdf"
+    default_actor_model_file = os.path.join(pkg_path, "models/actor_model.sdf")
     node.declare_parameter('~actor_model_file', default_actor_model_file)
 
-    actor_model_file = node.get_parameter('~actor_model_file')
+    actor_model_file = node.get_parameter('~actor_model_file').value
     file_xml = open(actor_model_file)
     xml_string = file_xml.read()
 

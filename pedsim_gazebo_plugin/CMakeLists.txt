@@ -69,6 +69,9 @@ install(PROGRAMS
   DESTINATION lib/${PROJECT_NAME}
 )
 
+install(FILES models worlds
+DESTINATION share/${PROJECT_NAME})
+
 ament_package()
 
 #############
