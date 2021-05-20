@@ -1,5 +1,16 @@
 # Pedestrian Simulator
 ## now development (unofficial)
+### Build
+```
+colcon build --symlink-install --packages-select pedsim_msgs pedsim_srvs pedsim_utils pedsim_gazebo_plugin
+```
+
+
+### Prerequisites
+```
+export GAZEBO_PLUGIN_PATH=$HOME/colcon_ws/install/pedsim_gazebo_plugin/lib/pedsim_gazebo_plugin/ActorPosesPlugin:$GAZEBO_PLUGIN_PATH
+
+```
 
 <img src=https://github.com/srl-freiburg/pedsim_ros/blob/master/pedsim_simulator/images/crowd1.png width=400/> | <img src=https://github.com/srl-freiburg/pedsim_ros/blob/master/pedsim_simulator/images/costmap.png width=400/>
 

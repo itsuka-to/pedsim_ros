@@ -59,7 +59,7 @@ ament_target_dependencies(ActorPosesPlugin
 
 install(
   TARGETS ActorPosesPlugin
-  DESTINATION ${PROJECT_NAME}
+  DESTINATION lib/${PROJECT_NAME}
 )
 
 ament_python_install_package(scripts)
@@ -69,7 +69,7 @@ install(PROGRAMS
   DESTINATION lib/${PROJECT_NAME}
 )
 
-install(FILES models worlds
+install(FILES models worlds launch
 DESTINATION share/${PROJECT_NAME})
 
 ament_package()
