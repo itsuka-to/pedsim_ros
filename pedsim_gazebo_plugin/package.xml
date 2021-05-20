@@ -11,6 +11,8 @@
   <license>TODO</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>ament_cmake_python</buildtool_depend>
+
   <build_depend>gazebo_ros</build_depend>
   <build_depend>rclcpp</build_depend>
   <build_depend>pedsim_msgs</build_depend>

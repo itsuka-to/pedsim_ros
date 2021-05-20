@@ -29,6 +29,7 @@ endif()
 # )
 
 find_package(ament_cmake REQUIRED)
+find_package(ament_cmake_python REQUIRED)
 find_package(gazebo_ros REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(rclcpp REQUIRED)
@@ -59,6 +60,13 @@ ament_target_dependencies(ActorPosesPlugin
 install(
   TARGETS ActorPosesPlugin
   DESTINATION ${PROJECT_NAME}
+)
+
+ament_python_install_package(scripts)
+install(PROGRAMS
+  scripts/pedsim_to_gazebo_world.py
+  scripts/spawn_pedsim_agents.py
+  DESTINATION lib/${PROJECT_NAME}
 )
 
 ament_package()
