@@ -1,33 +1,53 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.5)
 project(pedsim_utils)
-add_compile_options(-Wall -Wunused -std=c++11)
 
-set(PACKAGE_DEPS
-  cmake_modules
-  geometry_msgs
-  pedsim_msgs
-  roscpp
-  rospy
-)
-find_package(catkin REQUIRED COMPONENTS ${PACKAGE_DEPS})
+# Default to C99
+if(NOT CMAKE_C_STANDARD)
+  set(CMAKE_C_STANDARD 99)
+endif()
+
+# Default to C++14
+if(NOT CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD 17)  # ignition needs C++17
+endif()
+
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
+
+# set(PACKAGE_DEPS
+#   cmake_modules
+#   geometry_msgs
+#   pedsim_msgs
+#   roscpp
+#   rospy
+# )
+
+# find_package(catkin REQUIRED COMPONENTS ${PACKAGE_DEPS})
+
+find_package(ament_cmake REQUIRED)
+# find_package(cmake_modules REQUIRED)
+find_package(geometry_msgs REQUIRED)
+find_package(pedsim_msgs REQUIRED)
+find_package(rclpy REQUIRED)
 find_package(Eigen3 REQUIRED)
 
 ###################################
 ## catkin specific configuration ##
 ###################################
-catkin_package(
-  CATKIN_DEPENDS ${PACKAGE_DEPS}
-  LIBRARIES ${PROJECT_NAME}
-  INCLUDE_DIRS
-    include
-)
+# catkin_package(
+#   CATKIN_DEPENDS ${PACKAGE_DEPS}
+#   LIBRARIES ${PROJECT_NAME}
+#   INCLUDE_DIRS
+#     include
+# )
 
 ###########
 ## Build ##
 ###########
 include_directories(SYSTEM ${EIGEN3_INCLUDE_DIRS})
 include_directories(include)
-include_directories(${catkin_INCLUDE_DIRS})
+include_directories(${ament_cmake_INCLUDE_DIRS})
 
 set(LIBRARY_NAME ${PROJECT_NAME})
 add_library(${LIBRARY_NAME}
@@ -35,14 +55,21 @@ add_library(${LIBRARY_NAME}
   src/${PROJECT_NAME}/pedsim_utils.cpp
 )
 
-add_dependencies(${LIBRARY_NAME}
-  ${${PROJECT_NAME}_EXPORTED_TARGETS}
-  ${catkin_EXPORTED_TARGETS}
+ament_target_dependencies(${LIBRARY_NAME}
+  geometry_msgs
+  pedsim_msgs
+  rclpy
+  Eigen3
 )
 
-target_link_libraries(${LIBRARY_NAME}
-  ${catkin_LIBRARIES}
-)
+# add_dependencies(${LIBRARY_NAME}
+#   ${${PROJECT_NAME}_EXPORTED_TARGETS}
+#   ${catkin_EXPORTED_TARGETS}
+# )
+
+# target_link_libraries(${LIBRARY_NAME}
+#   ${catkin_LIBRARIES}
+# )
 
 #############
 ## Install ##
@@ -50,15 +77,17 @@ target_link_libraries(${LIBRARY_NAME}
 
 ## Mark executables and/or libraries for installation
 install(TARGETS ${LIBRARY_NAME}
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION lib # ${CATKIN_PACKAGE_LIB_DESTINATION}
 )
 
 ## Mark cpp header files for installation
 install(DIRECTORY include/${PROJECT_NAME}/
-  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+  DESTINATION include # ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
   FILES_MATCHING PATTERN "*.h"
   PATTERN ".svn" EXCLUDE
 )
+
+ament_package()
 
 #############
 ## Testing ##

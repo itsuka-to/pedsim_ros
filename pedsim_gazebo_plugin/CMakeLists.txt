@@ -34,52 +34,34 @@ find_package(geometry_msgs REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(gazebo_msgs REQUIRED)
 find_package(pedsim_msgs REQUIRED)
+find_package(Boost REQUIRED)
+find_package(std_msgs REQUIRED)
 
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 find_package(gazebo REQUIRED)
+
 link_directories(${GAZEBO_LIBRARY_DIRS})
+# include_directories(include)
+include_directories(${ament_cmake_INCLUDE_DIRS} ${GAZEBO_INCLUDE_DIRS})
 
+add_library(ActorPosesPlugin SHARED src/actor_poses_plugin.cpp)
 
-################################################
-## Declare ROS messages, services and actions ##
-################################################
-
-
-
-################################################
-## Declare ROS dynamic reconfigure parameters ##
-################################################
-
-
-###################################
-## catkin specific configuration ##
-###################################
-
-catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES gzb_vel_plugin
-  CATKIN_DEPENDS gazebo_ros roscpp  geometry_msgs pedsim_msgs
-#  DEPENDS system_lib
+target_link_libraries(ActorPosesPlugin ${GAZEBO_LIBRARIES})
+ament_target_dependencies(ActorPosesPlugin 
+  gazebo
+  rclcpp
+  std_msgs
+  pedsim_msgs
 )
 
-###########
-## Build ##
-###########
-
-## Specify additional locations of header files
-## Your package locations should be listed before other locations
-include_directories(
-  include
-  ${catkin_INCLUDE_DIRS}
-  ${GAZEBO_INCLUDE_DIRS}
+install(
+  TARGETS ActorPosesPlugin
+  DESTINATION ${PROJECT_NAME}
 )
 
-
-add_library(ActorPosesPlugin src/actor_poses_plugin.cpp)
-target_link_libraries(ActorPosesPlugin ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES})
-add_dependencies(ActorPosesPlugin ${catkin_EXPORTED_TARGETS})
+ament_package()
 
 #############
 ## Install ##

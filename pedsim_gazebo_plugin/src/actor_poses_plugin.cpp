@@ -8,31 +8,54 @@ Created on Mon Dec  2
 #include <gazebo/physics/physics.hh>
 #include <gazebo/util/system.hh>
 
-#include <ros/ros.h>
-#include "ros/callback_queue.h"
-#include "ros/subscribe_options.h"
+// #include <ros/ros.h>
+// #include "ros/callback_queue.h"
+// #include "ros/subscribe_options.h"
 #include <thread>
+#include <boost/bind.hpp>
+#include <boost/format.hpp>
 
-#include<pedsim_msgs/TrackedPersons.h>
-#include<pedsim_msgs/AgentStates.h>
+#include <rclcpp/rclcpp.hpp>
+#include <gazebo_ros/node.hpp>
+
+#include <std_msgs/msg/string.hpp>
+#include <pedsim_msgs/msg/tracked_persons.hpp>
+#include <pedsim_msgs/msg/agent_states.hpp>
 
 
 namespace gazebo
 {
     class ActorPosesPlugin : public WorldPlugin{
         public:
-            ActorPosesPlugin() : WorldPlugin(){}
+            ActorPosesPlugin() : WorldPlugin(){
+
+            }
 
         void Load(physics::WorldPtr _world, sdf::ElementPtr _sdf){
-            this->world_ = _world;
-            if (!ros::isInitialized()){
-                ROS_ERROR("ROS not initialized");
+            this->node = gazebo_ros::Node::Get(_sdf);
+            
+            if (!rclcpp::ok()){
+                RCLCPP_ERROR(node->get_logger(), "ROS not initialized");
                 return;
             }
-            rosNode.reset(new ros::NodeHandle("gazebo_client"));
-            ros::SubscribeOptions so = ros::SubscribeOptions::create<pedsim_msgs::AgentStates>("/pedsim_simulator/simulated_agents", 1,boost::bind(&ActorPosesPlugin::OnRosMsg, this, _1), ros::VoidPtr(),&rosQueue);
-            rosSub = rosNode->subscribe(so);
-            rosQueueThread =std::thread(std::bind(&ActorPosesPlugin::QueueThread, this));
+
+            this->world_ = _world;
+            // rosNode.reset(new ros::NodeHandle("gazebo_client"));
+            
+            // ros::SubscribeOptions so = ros::SubscribeOptions::create<pedsim_msgs::AgentStates>(
+            //     "/pedsim_simulator/simulated_agents",
+            //     1,
+            //     boost::bind(&ActorPosesPlugin::OnRosMsg, this, _1),
+            //     ros::VoidPtr(),&rosQueue
+            // );
+            // rosSub = rosNode->subscribe(so);
+            // rosQueueThread =std::thread(std::bind(&ActorPosesPlugin::QueueThread, this));
+            this->agent_states_sub_ = this->node->create_subscription<pedsim_msgs::msg::AgentStates>(
+                "/pedsim_simulator/simulated_agents",
+                1,
+                std::bind(&ActorPosesPlugin::OnRosMsg, this, std::placeholders::_1)
+            );
+
             // in case you need to change/modify model on update
             // this->updateConnection_ = event::Events::ConnectWorldUpdateBegin(std::bind(&ActorPosesPlugin::OnUpdate, this));
         }
@@ -40,7 +63,7 @@ namespace gazebo
 
         public:
             // call back function when receive rosmsg
-            void OnRosMsg( const pedsim_msgs::AgentStatesConstPtr msg) {
+            void OnRosMsg( const pedsim_msgs::msg::AgentStates::SharedPtr msg) {
 //              ROS_INFO ("OnRosMsg ... ");
                 std::string model_name;
 #if GAZEBO_MAJOR_VERSION < 9
@@ -73,7 +96,7 @@ namespace gazebo
                                 tmp_model->SetWorldPose(gzb_pose);
                             }
                             catch(gazebo::common::Exception gz_ex){
-                                ROS_ERROR("Error setting pose %s - %s", frame_id.c_str(), gz_ex.GetErrorStr().c_str());
+                                RCLCPP_ERROR(node->get_logger(), "Error setting pose");// boost::format("Error setting pose %s - %s") % frame_id.c_str() % gz_ex.GetErrorStr());
                             }
 
                         }
@@ -84,18 +107,22 @@ namespace gazebo
 
 
         // ROS helper function that processes messages
-        private: void QueueThread() {
-            static const double timeout = 0.1;
-            while (rosNode->ok()) {
-                rosQueue.callAvailable(ros::WallDuration(timeout));
-            }
-        }
+        // private: void QueueThread() {
+        //     static const double timeout = 0.1;
+        //     while (rosNode->ok()) {
+        //         rosQueue.callAvailable(ros::WallDuration(timeout));
+        //     }
+        // }
 
     private:
-        std::unique_ptr<ros::NodeHandle> rosNode;
-        ros::Subscriber rosSub;
-        ros::CallbackQueue rosQueue;
-        std::thread rosQueueThread;
+        // std::unique_ptr<ros::NodeHandle> rosNode;
+        gazebo_ros::Node::SharedPtr node;
+
+        // ros::Subscriber rosSub;
+        // ros::CallbackQueue rosQueue;
+        // std::thread rosQueueThread;
+        rclcpp::Subscription<pedsim_msgs::msg::AgentStates>::SharedPtr agent_states_sub_;
+
         physics::WorldPtr world_;
         event::ConnectionPtr updateConnection_;
         const float MODEL_OFFSET = 0.75;
