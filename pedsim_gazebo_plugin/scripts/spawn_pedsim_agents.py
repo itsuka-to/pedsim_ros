@@ -82,7 +82,7 @@ def main(args=args):
     # pkg_path = rospack1.get_path('pedsim_gazebo_plugin')
     # default_actor_model_file = pkg_path + "/models/actor_model.sdf"
     pkg_path = get_package_share_directory('pedsim_gazebo_plugin')
-    default_actor_model_file = pkg_path + "models/actor_model.sdf)
+    default_actor_model_file = pkg_path + "models/actor_model.sdf"
     node.declare_parameter('~actor_model_file', default_actor_model_file)
 
     actor_model_file = node.get_parameter('~actor_model_file')
