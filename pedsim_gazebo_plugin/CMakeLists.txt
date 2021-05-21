@@ -62,14 +62,17 @@ install(
   DESTINATION lib/${PROJECT_NAME}
 )
 
-ament_python_install_package(scripts)
+# ament_python_install_package(scripts)
 install(PROGRAMS
   scripts/pedsim_to_gazebo_world.py
   scripts/spawn_pedsim_agents.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
-install(FILES models worlds launch
+install(DIRECTORY launch/
+DESTINATION share/${PROJECT_NAME}/launch)
+
+install(FILES models worlds
 DESTINATION share/${PROJECT_NAME})
 
 ament_package()

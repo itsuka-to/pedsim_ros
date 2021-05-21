@@ -12,6 +12,10 @@ Created on Mon Dec  2
 // #include "ros/callback_queue.h"
 // #include "ros/subscribe_options.h"
 #include <thread>
+#include <string>
+#include <vector>
+#include <memory>
+
 #include <boost/bind.hpp>
 #include <boost/format.hpp>
 
@@ -32,8 +36,14 @@ namespace gazebo
             }
 
         void Load(physics::WorldPtr _world, sdf::ElementPtr _sdf){
+            std::cout << "Gazebo Load --- Start ---" << std::endl;
+
+            // Initialize ROS node
             this->node = gazebo_ros::Node::Get(_sdf);
-            
+
+            // Get QoS profiles
+            const gazebo_ros::QoS & qos = this->node->get_qos();
+
             if (!rclcpp::ok()){
                 RCLCPP_ERROR(node->get_logger(), "ROS not initialized");
                 return;
@@ -52,18 +62,33 @@ namespace gazebo
             // rosQueueThread =std::thread(std::bind(&ActorPosesPlugin::QueueThread, this));
             this->agent_states_sub_ = this->node->create_subscription<pedsim_msgs::msg::AgentStates>(
                 "/pedsim_simulator/simulated_agents",
-                1,
+                qos.get_subscription_qos("/pedsim_simulator/simulated_agents", rclcpp::QoS(1)),
                 std::bind(&ActorPosesPlugin::OnRosMsg, this, std::placeholders::_1)
             );
 
+            this->test_sub_ = this->node->create_subscription<std_msgs::msg::String>(
+                "/test",
+                qos.get_subscription_qos("/test", rclcpp::QoS(1)),
+                std::bind(&ActorPosesPlugin::OnTestMsg, this, std::placeholders::_1)
+            );
+
+            std::cout << "Gazebo Load ---  End  ---" << std::endl;
             // in case you need to change/modify model on update
             // this->updateConnection_ = event::Events::ConnectWorldUpdateBegin(std::bind(&ActorPosesPlugin::OnUpdate, this));
         }
 
 
         public:
+            void OnTestMsg(const std_msgs::msg::String::SharedPtr msg){
+                std::lock_guard<std::mutex> scoped_lock(lock_);
+                std::cout << msg->data << std::endl;
+            }
+
             // call back function when receive rosmsg
             void OnRosMsg( const pedsim_msgs::msg::AgentStates::SharedPtr msg) {
+                std::lock_guard<std::mutex> scoped_lock(lock_);
+
+                std::cout << "OnRosMsg --- Start ---" << std::endl;
 //              ROS_INFO ("OnRosMsg ... ");
                 std::string model_name;
 #if GAZEBO_MAJOR_VERSION < 9
@@ -122,10 +147,13 @@ namespace gazebo
         // ros::CallbackQueue rosQueue;
         // std::thread rosQueueThread;
         rclcpp::Subscription<pedsim_msgs::msg::AgentStates>::SharedPtr agent_states_sub_;
+        rclcpp::Subscription<std_msgs::msg::String>::SharedPtr test_sub_;
 
         physics::WorldPtr world_;
         event::ConnectionPtr updateConnection_;
         const float MODEL_OFFSET = 0.75;
+
+        std::mutex lock_;
 
     };
     GZ_REGISTER_WORLD_PLUGIN(ActorPosesPlugin)

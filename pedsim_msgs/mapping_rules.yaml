@@ -1,0 +1,16 @@
+-
+  ros1_package_name: 'pedsim_msgs'
+  ros1_message_name: 'AgentForce.msg'
+  ros2_package_name: 'pedsim_msgs'
+  ros2_message_name: 'AgentForce.msg'
+# -
+#   ros1_package_name: 'pedsim_msgs'
+#   ros1_message_name: 'AgentState.msg'
+#   ros2_package_name: 'pedsim_msgs'
+#   ros2_message_name: 'AgentState.msg'
+# -
+#   ros1_package_name: 'pedsim_msgs'
+#   ros1_message_name: 'AgentStates.msg'
+#   ros2_package_name: 'pedsim_msgs'
+#   ros2_message_name: 'AgentStates.msg'
+

@@ -22,18 +22,20 @@ global xml_file
 def actor_poses_callback(actors):
     global node, xml_string
 
+    node.get_logger().info(f'actor_length: {len(actors.agent_states)}')
+
     for actor in actors.agent_states:
         actor_id = str( actor.id )
         actor_pose = actor.pose
         node.get_logger().info("Spawning model: actor_id = %s" % actor_id)
 
-        model_pose = Pose(Point(x= actor_pose.position.x,
+        model_pose = Pose(position=Point(x= actor_pose.position.x,
                                y= actor_pose.position.y,
                                z= actor_pose.position.z),
-                         Quaternion(actor_pose.orientation.x,
-                                    actor_pose.orientation.y,
-                                    actor_pose.orientation.z,
-                                    actor_pose.orientation.w) )
+                         orientation=Quaternion(x=actor_pose.orientation.x,
+                                    y=actor_pose.orientation.y,
+                                    z=actor_pose.orientation.z,
+                                    w=actor_pose.orientation.w) )
 
         # cli.spawn_model(actor_id, xml_string, "", model_pose, "world")
         spawn_entity(node, actor_id, xml_string, "", model_pose, "world")
@@ -55,20 +57,20 @@ def spawn_entity(node, name, entity_xml, robot_namespace, initial_pose, referenc
     if client.wait_for_service(timeout_sec=timeout):
         req = SpawnEntity.Request()
         req.name = name
-        req.xml = str(entity_xml, 'utf-8')
+        req.xml = entity_xml  # str(entity_xml, 'utf-8')
         req.robot_namespace = robot_namespace
         req.initial_pose = initial_pose
         req.reference_frame = reference_frame
         node.get_logger().info('Calling service %s/spawn_entity' % gazebo_namespace)
         srv_call = client.call_async(req)
-        while rclpy.ok():
-            if srv_call.done():
-                node.get_logger().info('Spawn status: %s' % srv_call.result().status_message)
-                break
-            rclpy.spin_once(node)
-        return srv_call.result().success
-    node.get_logger().error(
-        'Service %s/spawn_entity unavailable. Was Gazebo started with GazeboRosFactory?')
+        # while rclpy.ok():
+        #     if srv_call.done():
+        #         node.get_logger().info('Spawn status: %s' % srv_call.result().status_message)
+        #         break
+        #     rclpy.spin_once(node)
+        return True # srv_call.result().success
+    # node.get_logger().error(
+    #     'Service %s/spawn_entity unavailable. Was Gazebo started with GazeboRosFactory?')
     return False
 
 
@@ -93,7 +95,7 @@ def main(args=None):
 
     node.get_logger().info("Waiting for gazebo services...")
     while not cli.wait_for_service(timeout_sec=1.0):
-        node.get_logger().info('service not availabe, waiting again...')
+        node.get_logger().info('service not available, waiting again...')
     
     node.get_logger().info("service: spawn_sdf_model is available ....")
 
