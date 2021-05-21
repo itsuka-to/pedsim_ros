@@ -41,7 +41,7 @@ def generate_launch_description():
         launch_arguments={
             'world': world_file, 
             'use_sim_time': 'true',
-            'gdb': 'true',
+            'gdb': 'false',
         }.items()
     )
 
