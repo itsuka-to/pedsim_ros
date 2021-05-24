@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 Created on Mon Dec  2 17:03:34 2019
 
@@ -11,30 +11,30 @@ import xml.etree.ElementTree as ET
 global gzb_world
 def generate_pose(x1, y1, x2, y2):
     if x2-x1==0:
-        print >> gzb_world, "\t  <pose frame=''>{} {}  1.4 0 0 {}</pose>".format( (x2+x1)/2, (y2+y1)/2, 1.57 )#x1, y1, math.atan((y2-y1)/(x2-x1)) )
+        print("\t  <pose frame=''>{} {}  1.4 0 0 {}</pose>".format( (x2+x1)/2, (y2+y1)/2, 1.57 ), file=gzb_world)  #x1, y1, math.atan((y2-y1)/(x2-x1)) )
     else:
-        print >> gzb_world, "\t  <pose frame=''>{} {}  1.4 0 0 {}</pose>".format( (x2+x1)/2, (y2+y1)/2, math.atan( (y2-y1)/(x2-x1) )  )#x1, y1, math.atan((y2-y1)/(x2-x1)) )
+        print("\t  <pose frame=''>{} {}  1.4 0 0 {}</pose>".format( (x2+x1)/2, (y2+y1)/2, math.atan( (y2-y1)/(x2-x1) )  ), file=gzb_world)#x1, y1, math.atan((y2-y1)/(x2-x1)) )
 
 def generate_size(x1, y1, x2, y2):
     l = math.sqrt( pow(y2-y1,2) + pow(x2-x1,2)  )
-    print >> gzb_world, "\t     <size> {} .2  2.8 </size>".format( l )
+    print("\t     <size> {} .2  2.8 </size>".format( l ), file=gzb_world)
     
     
     
 def generate_obstacle(x1, y1, x2, y2, idx):
-     print >> gzb_world, '''
+     print('''
      <model name='grey_wall_{}'>
       <static>1</static>
       <link name='link'>
-      '''.format(idx)
+      '''.format(idx), file=gzb_world)
      generate_pose(x1, y1, x2, y2)     
-     print >> gzb_world, '''    
+     print('''    
         <collision name='collision'>
           <geometry>
             <box>
-            '''
+            ''', file=gzb_world)
      generate_size(x1, y1, x2, y2)
-     print >> gzb_world, '''
+     print('''
       \t   </box>
           </geometry>
           <max_contacts>10</max_contacts>
@@ -55,9 +55,9 @@ def generate_obstacle(x1, y1, x2, y2, idx):
           <cast_shadows>0</cast_shadows>
           <geometry>
             <box>
-            '''
+            ''', file=gzb_world)
      generate_size(x1, y1, x2, y2)
-     print >> gzb_world, '''
+     print('''
       \t   </box>
        </geometry>
           <material>
@@ -73,7 +73,7 @@ def generate_obstacle(x1, y1, x2, y2, idx):
         <kinematic>0</kinematic>
       </link>
     </model>
-    '''.format( 1,1)#math.sqrt( pow(y2-y1,2) + pow(x2-x1,2)  ) )
+    '''.format( 1,1), file=gzb_world)  #math.sqrt( pow(y2-y1,2) + pow(x2-x1,2)  ) )
 
 
 
@@ -100,8 +100,8 @@ def generate_gzb_world( pedsim_file_name ):
     gazebo_world =  pkg_path + "/worlds/" + pedsim_file_name.split('.')[0] + ".world" #bo_airport.xml"
     global gzb_world    
     with open(gazebo_world, 'w') as gzb_world:
-        print >> gzb_world, "<?xml version=\"1.0\" ?>"    
-        print >> gzb_world, '''
+        print("<?xml version=\"1.0\" ?>", file=gzb_world)
+        print('''
     <!-- this file is auto generated using pedsim_gazebo_plugin pkg -->    
     <sdf version="1.5">
       <world name="default">
@@ -116,11 +116,11 @@ def generate_gzb_world( pedsim_file_name ):
         <uri>model://sun</uri>
       </include>
     
-        '''
+        ''', file=gzb_world)
         # use the parse() function to load and parse an XML file
     #    xmlfile =  pkg_path + "/scenarios/obstacle.xml"
         parseXML(xml_scenario)
-        print >> gzb_world, '''
+        print('''
             <plugin name="ActorPosesPlugin" filename="libActorPosesPlugin.so">
         </plugin>
     
@@ -128,8 +128,8 @@ def generate_gzb_world( pedsim_file_name ):
       </world>
     </sdf>
     
-        '''
-    print "gazbo world has been generated: {}".format( gazebo_world)
+        ''', file=gzb_world)
+    print("gazbo world has been generated: {}".format( gazebo_world))
       
       
       
@@ -138,7 +138,7 @@ def generate_launch_file( pedsim_file_name ):
     pkg_path = rospack2.get_path('pedsim_gazebo_plugin')
     launch_file =  pkg_path + "/launch/" + pedsim_file_name.split('.')[0] + ".launch" #bo_airport.xml"
     with open(launch_file, 'w') as launch:
-        print >> launch, '''<launch>
+        print('''<launch>
 
         <!-- this file is auto generated using pedsim_gazebo_plugin pkg -->  
         
@@ -152,17 +152,17 @@ def generate_launch_file( pedsim_file_name ):
 
 
 </launch>
-'''.format(pedsim_file_name.split('.')[0])
-    print "launch file has been generated: {}".format( launch_file )
+'''.format(pedsim_file_name.split('.')[0]), file=launch)
+    print("launch file has been generated: {}".format( launch_file ))
  
 
       
 if __name__ == "__main__": 
-    pedsim_file_name = raw_input(">> enter pedsim scenaria name: file_name.xml \n")
+    pedsim_file_name = input(">> enter pedsim scenaria name: file_name.xml \n")
 
     # genrate gazebo wolrd 
     generate_gzb_world( pedsim_file_name )     
     generate_launch_file( pedsim_file_name ) 
-    print ">> after you launch the scenario using pedsim_simulator, launch the generated world using: "
-    print " \" $roslaunch pedsim_gazebo_plugin {}.launch\"  ".format( pedsim_file_name.split('.')[0] )
+    print(">> after you launch the scenario using pedsim_simulator, launch the generated world using: ")
+    print(" \" $roslaunch pedsim_gazebo_plugin {}.launch\"  ".format( pedsim_file_name.split('.')[0] ))
     
