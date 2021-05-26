@@ -20,12 +20,13 @@
 
 
     <!--Agents-->
-    <!-- <agent x="17" y="11" n="1" dx="0" dy="0" type="2">
+    <agent x="17" y="11" n="1" dx="0" dy="0" type="2">
         <addwaypoint id="robot_start"/>
         <addwaypoint id="robot_goal"/>
-    </agent> -->
+    </agent>
+    
     <!--AgentClusters-->
-    <agent x="7" y="11" n="1" dx="0" dy="0" type="1">
+    <agent x="7" y="11" n="1" dx="0" dy="0" type="3">
         <!-- <addwaypoint id="robot_start"/> -->
         <addwaypoint id="robot_s1"/>
         <addwaypoint id="robot_s2"/>

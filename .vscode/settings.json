@@ -1,7 +1,8 @@
 {
     "files.associations": {
         "*.ipp": "cpp",
-        "*.tcc": "cpp"
+        "*.tcc": "cpp",
+        "random": "cpp"
     },
     "ros.distro": "noetic",
     "python.autoComplete.extraPaths": [
