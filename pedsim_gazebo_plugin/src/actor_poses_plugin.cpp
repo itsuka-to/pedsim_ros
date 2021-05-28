@@ -21,6 +21,7 @@ Created on Mon Dec  2
 
 #include <rclcpp/rclcpp.hpp>
 #include <gazebo_ros/node.hpp>
+#include <ignition/math/Vector3.hh>
 
 #include <std_msgs/msg/string.hpp>
 #include <pedsim_msgs/msg/tracked_persons.hpp>
@@ -88,7 +89,7 @@ namespace gazebo
             void OnRosMsg( const pedsim_msgs::msg::AgentStates::SharedPtr msg) {
                 std::lock_guard<std::mutex> scoped_lock(lock_);
 
-                std::cout << "OnRosMsg --- Start ---" << std::endl;
+                // std::cout << "OnRosMsg --- Start ---" << std::endl;
 //              ROS_INFO ("OnRosMsg ... ");
                 std::string model_name;
 #if GAZEBO_MAJOR_VERSION < 9
@@ -119,6 +120,11 @@ namespace gazebo
 
                             try{
                                 tmp_model->SetWorldPose(gzb_pose);
+                                
+                                // set model velocity to 0
+                                ignition::math::Vector3d vel(0,0,0);
+                                tmp_model->SetLinearVel(vel);
+                                tmp_model->SetAngularVel(vel);
                             }
                             catch(gazebo::common::Exception gz_ex){
                                 RCLCPP_ERROR(node->get_logger(), "Error setting pose");// boost::format("Error setting pose %s - %s") % frame_id.c_str() % gz_ex.GetErrorStr());
