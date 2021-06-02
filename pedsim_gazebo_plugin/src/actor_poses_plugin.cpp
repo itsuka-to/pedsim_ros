@@ -157,7 +157,7 @@ namespace gazebo
 
         physics::WorldPtr world_;
         event::ConnectionPtr updateConnection_;
-        const float MODEL_OFFSET = 0.75;
+        const float MODEL_OFFSET = 0.80;
 
         std::mutex lock_;
 
