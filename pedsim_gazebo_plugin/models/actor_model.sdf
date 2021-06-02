@@ -12,6 +12,11 @@
           <size>.5 .5 1.5</size>
         </box>
       </geometry>
+      <surface>
+        <contact>
+          <collide_without_contact>1</collide_without_contact>
+        </contact>
+      </surface>
     </collision>
 
     <visual name="visual">
