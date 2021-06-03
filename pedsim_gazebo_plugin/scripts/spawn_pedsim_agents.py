@@ -15,6 +15,8 @@ from rospkg import RosPack
 from pedsim_msgs.msg  import AgentStates
 
 from ament_index_python.packages import get_package_share_directory
+import xml.etree.ElementTree as ET
+import copy
 
 # xml file containing a gazebo model to represent agent, currently is represented by a cubic but can be changed
 global xml_file
@@ -37,8 +39,20 @@ def actor_poses_callback(actors):
                                     z=actor_pose.orientation.z,
                                     w=actor_pose.orientation.w) )
 
+
+        xml_copy = copy.copy(xml_string)
+        sdf = ET.fromstring(xml_copy)
+        contact = sdf.find('model/link/collision/surface/contact')
+        collide_without_contact_bitmask = ET.SubElement(contact, 'collide_without_contact_bitmask')
+
+        # TODO: support over 16 agents
+        collide_without_contact_bitmask.text = f"{0x01 << (actor.id % 16)}"
         # cli.spawn_model(actor_id, xml_string, "", model_pose, "world")
-        spawn_entity(node, actor_id, xml_string, "", model_pose, "world")
+
+        print(ET.tostring(sdf, encoding='utf-8'))
+        # node.get_logger().info(ET.tostring(sdf, encoding='utf-8'))
+
+        spawn_entity(node, actor_id, ET.tostring(sdf, encoding='utf-8').decode('utf-8'), "", model_pose, "world")
     
     node.get_logger().info("all agents have been spawned !")
     node.destroy_node()
