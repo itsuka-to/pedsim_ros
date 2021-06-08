@@ -38,6 +38,32 @@
         <addwaypoint id="robot_s2"/>
         <!-- <addwaypoint id="robot_s1"/> -->
     </agent>
+
+    <agent x="6" y="24" n="1" dx="1" dy="1" type="3">
+        <!-- <addwaypoint id="robot_start"/> -->
+        <addwaypoint id="robot_s2"/>
+        <addwaypoint id="robot_s3"/>
+        <addwaypoint id="robot_s4"/>
+        <addwaypoint id="robot_goal"/>
+        <addwaypoint id="robot_s4"/>
+        <addwaypoint id="robot_s3"/>
+        <addwaypoint id="robot_s2"/>
+        <addwaypoint id="robot_s1"/>
+        <!-- <addwaypoint id="robot_s1"/> -->
+    </agent>
+
+    <agent x="12" y="25.3" n="1" dx="1" dy="1" type="3">
+        <!-- <addwaypoint id="robot_start"/> -->
+        <addwaypoint id="robot_s3"/>
+        <addwaypoint id="robot_s4"/>
+        <addwaypoint id="robot_goal"/>
+        <addwaypoint id="robot_s4"/>
+        <addwaypoint id="robot_s3"/>
+        <addwaypoint id="robot_s2"/>
+        <addwaypoint id="robot_s1"/>
+        <addwaypoint id="robot_s2"/>
+        <!-- <addwaypoint id="robot_s1"/> -->
+    </agent>
     <!-- <agent x="7" y="5" n="5" dx="3" dy="3" type="1">
         <addqueue id="info_desk"/>
         <addwaypoint id="bookshop_exit"/>
